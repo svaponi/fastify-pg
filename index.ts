@@ -3,6 +3,7 @@ import {Pool} from 'pg';
 import * as dotenv from 'dotenv';
 import * as path from "node:path";
 import * as fs from "node:fs";
+import * as client from 'prom-client';
 
 const fastify: FastifyInstance = Fastify({logger: true});
 
@@ -17,6 +18,12 @@ const config = {
 console.log(config)
 const pool = new Pool(config);
 
+client.collectDefaultMetrics();
+
+const requestCounter = new client.Counter({
+    name: 'http_requests_total',
+    help: 'Total number of requests'
+});
 
 fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -30,6 +37,7 @@ fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
 
 fastify.get('/users', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
+        requestCounter.inc();
         const startTime = Date.now();
         const size = parseInt((request.query as { size?: string }).size || '100', 10);
         const result = await pool.query<{
@@ -48,6 +56,15 @@ fastify.get('/users', async (request: FastifyRequest, reply: FastifyReply) => {
     } catch (err) {
         fastify.log.error(err);
         reply.status(500).send({error: 'Database query failed'});
+    }
+});
+
+fastify.get('/metrics', async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        reply.header('Content-Type', client.register.contentType);
+        reply.send(await client.register.metrics());
+    } catch (err) {
+        reply.status(500).send({error: 'Failed to get metrics'});
     }
 });
 
