@@ -5,7 +5,8 @@ import * as path from "node:path";
 import * as fs from "node:fs";
 import * as client from 'prom-client';
 
-const fastify: FastifyInstance = Fastify({logger: true});
+const logger: boolean = process.env.FASTIFY_LOGGER === 'true'
+const fastify: FastifyInstance = Fastify({logger});
 
 dotenv.config();
 const config = {
