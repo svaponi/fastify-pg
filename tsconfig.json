@@ -1,8 +1,14 @@
 {
-  "target": "ES2020",
-  "module": "CommonJS",
-  "strict": true,
-  "esModuleInterop": true,
-  "moduleResolution": "node",
-  "outDir": "dist"
+  "compilerOptions": {
+    "target": "ES2020",                // JS version to compile to
+    "module": "CommonJS",              // Node.js module system
+    "strict": true,                     // enable strict type checks
+    "esModuleInterop": true,            // allow import from CommonJS modules
+    "moduleResolution": "node",         // how modules are resolved
+    "outDir": "dist",                   // compiled JS output folder
+    "skipLibCheck": true,               // skip type checking of node_modules
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["**/*.ts"],               // include all TypeScript files
+  "exclude": ["node_modules", "dist"]   // exclude compiled output & node_modules
 }
