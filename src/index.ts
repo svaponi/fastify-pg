@@ -39,7 +39,7 @@ fastify.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
     }
 });
 
-fastify.get('/users', async (request: FastifyRequest, reply: FastifyReply) => {
+const getUsers = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         requestCounter.inc();
         const startTime = Date.now();
@@ -61,7 +61,10 @@ fastify.get('/users', async (request: FastifyRequest, reply: FastifyReply) => {
         fastify.log.error(err);
         reply.status(500).send({error: 'Database query failed'});
     }
-});
+}
+
+fastify.get('/users', getUsers);
+fastify.get('/api/users', getUsers);
 
 fastify.get('/metrics', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
