@@ -12,6 +12,7 @@ RUN npm install --production
 COPY --from=builder node_modules ./node_modules
 COPY --from=builder dist ./dist
 COPY --from=builder src/schema.sql ./dist/schema.sql
-EXPOSE 3000
 ENV NODE_ENV=production
+ENV PORT=5000
+EXPOSE $PORT
 CMD ["node", "dist/index.js"]

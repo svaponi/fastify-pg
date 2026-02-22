@@ -22,7 +22,7 @@ const pool = new Pool(config);
 client.collectDefaultMetrics();
 
 const requestCounter = new client.Counter({
-    name: 'http_requests_total',
+    name: 'http_requests_users',
     help: 'Total number of requests'
 });
 
@@ -120,7 +120,7 @@ const start = async () => {
         const port: number = parseInt(process.env.PORT || '5000', 10);
         await initSchema()
         await seedUsers()
-        await fastify.listen({port});
+        await fastify.listen({port, host: '0.0.0.0'});
         console.log(`Server running at http://localhost:${port}`);
         console.log(`- http://localhost:${port}/metrics`);
         console.log(`- http://localhost:${port}/users`);
