@@ -26,12 +26,16 @@ const requestCounter = new client.Counter({
 });
 
 fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
+    reply.redirect('/health');
+});
+
+fastify.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-        const result = await pool.query<{ now: string }>('SELECT NOW()');
-        return {time: result.rows[0].now};
+        const result = await pool.query<{ one: number }>('SELECT 1 as one');
+        return {status: result.rows[0].one === 1 ? 'up' : 'pigs might fly'};
     } catch (err) {
         fastify.log.error(err);
-        reply.status(500).send({error: 'Database query failed'});
+        return {status: 'down'};
     }
 });
 
@@ -109,12 +113,13 @@ async function seedUsers() {
 
 const start = async () => {
     try {
+        const port: number = parseInt(process.env.PORT || '5000', 10);
         await initSchema()
         await seedUsers()
-        await fastify.listen({port: 3000});
-        console.log('Server running at http://localhost:3000');
-        console.log('- http://localhost:3000/metrics');
-        console.log('- http://localhost:3000/users');
+        await fastify.listen({port});
+        console.log(`Server running at http://localhost:${port}`);
+        console.log(`- http://localhost:${port}/metrics`);
+        console.log(`- http://localhost:${port}/users`);
     } catch (err) {
         fastify.log.error(err);
         process.exit(1);
